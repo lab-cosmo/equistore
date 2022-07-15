@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Iter","Iterator over key/block pairs in a `TensorMap`"],["IterMut","Iterator over key/block pairs in a `TensorMap`, with mutable access to the blocks"],["TensorMap","A tensor map is the main user-facing struct of this library, and can store any kind of data used in atomistic machine learning."]]});

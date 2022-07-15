@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["equistore"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/1.62.0/std/error/trait.Error.html\" title=\"trait std::error::Error\">Error</a> for <a class=\"enum\" href=\"equistore/enum.Error.html\" title=\"enum equistore::Error\">Error</a>","synthetic":false,"types":["equistore::Error"]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
