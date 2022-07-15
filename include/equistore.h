@@ -149,7 +149,7 @@ typedef struct eqs_array_t {
   /**
    * This function needs to store the "data origin" for this array in
    * `origin`. Users of `eqs_array_t` should register a single data
-   * origin with `register_data_origin`, and use it for all compatible
+   * origin with `eqs_register_data_origin`, and use it for all compatible
    * arrays.
    */
   eqs_status_t (*origin)(const void *array, eqs_data_origin_t *origin);
@@ -187,7 +187,10 @@ typedef struct eqs_array_t {
    */
   eqs_status_t (*create)(const void *array, const uintptr_t *shape, uintptr_t shape_count, struct eqs_array_t *new_array);
   /**
-   * Make a copy of this `array` and return the new array in `new_array`
+   * Make a copy of this `array` and return the new array in `new_array`.
+   *
+   * The new array is expected to have the same data origin and parameters
+   * (data type, data location, etc.)
    */
   eqs_status_t (*copy)(const void *array, struct eqs_array_t *new_array);
   /**

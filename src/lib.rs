@@ -32,6 +32,7 @@ use c_api::eqs_status_t;
 pub mod io;
 
 #[cfg(not(feature = "serialization"))]
+#[allow(clippy::needless_pass_by_value)]
 pub mod io {
     #![allow(unused_variables)]
     use super::{Error, TensorMap};

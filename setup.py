@@ -56,6 +56,7 @@ class cmake_ext(build_ext):
             f"-DCMAKE_BUILD_TYPE={EQUISTORE_BUILD_TYPE}",
             "-DBUILD_SHARED_LIBS=ON",
             "-DEQUISTORE_BUILD_FOR_PYTHON=ON",
+            "-DEQUISTORE_SERIALIZATION=ON",
         ]
 
         if RUST_BUILD_TARGET is not None:

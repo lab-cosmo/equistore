@@ -30,3 +30,6 @@ serialization = ["ndarray", "py_literal", "byteorder", "num-traits", "zip"]
 [build-dependencies]
 cbindgen = { version = "0.24", default-features = false }
 glob = "0.3"
+
+[dev-dependencies]
+which = "4"

@@ -122,12 +122,19 @@ pub unsafe extern fn eqs_labels_position(
         if labels.labels_ptr.is_null() {
             return Err(Error::InvalidParameter(
                 "these labels do not support calling eqs_labels_position".into()
-            ))
+            ));
         }
 
-        let labels = labels.labels_ptr.cast::<Labels>();
+        let labels = &(*labels.labels_ptr.cast::<Labels>());
+        if values_count != labels.size() {
+            return Err(Error::InvalidParameter(format!(
+                "expected label of size {} in eqs_labels_position, got size {}",
+                (*labels).size(), values_count
+            )));
+        }
+
         let label = std::slice::from_raw_parts(values.cast(), values_count);
-        *result = (*labels).position(label).map_or(-1, |p| p as i64);
+        *result = labels.position(label).map_or(-1, |p| p as i64);
 
         Ok(())
     })

@@ -242,14 +242,20 @@ class TensorBlock:
         """
         Add a set of gradients with respect to ``parameters`` in this block.
 
-        :param data: the gradient array, of shape ``(gradient_samples,
-            components, properties)``, where the components and properties labels
-            are the same as the values components and properties labels.
         :param parameter: add gradients with respect to this ``parameter`` (e.g.
             ``positions``, ``cell``, ...)
+        :param data: the gradient array, of shape ``(gradient_samples,
+            components, properties)``, where the properties labels are the same
+            as the values' properties labels.
         :param samples: labels describing the gradient samples
         :param components: labels describing the gradient components
         """
+        if self._parent is not None:
+            raise ValueError(
+                "can not add gradient on this block since it is a view inside "
+                "a TensorMap"
+            )
+
         data = ArrayWrapper(data)
         self._gradients.append(data)
 

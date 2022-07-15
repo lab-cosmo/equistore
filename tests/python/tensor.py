@@ -255,7 +255,7 @@ keys: ['key_1' 'key_2']
         )
         self.assertTrue(np.all(gradient.data == expected))
 
-        ## unsorted samples
+        # unsorted samples
         tensor = test_tensor_map()
         tensor.keys_to_samples("key_2", sort_samples=False)
 

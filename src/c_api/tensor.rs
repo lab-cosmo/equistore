@@ -209,6 +209,13 @@ pub unsafe extern fn eqs_tensormap_blocks_matching(
     catch_unwind(|| {
         check_pointers!(tensor, block_indexes, count);
 
+        if *count != (*tensor).keys().count() {
+            return Err(Error::InvalidParameter(format!(
+                "expected an array of {} elements as input to eqs_tensormap_blocks_matching, got {} elements",
+                (*tensor).keys().count(), *count
+            )));
+        }
+
         let selection = Labels::try_from(&selection)?;
         let rust_blocks = (*tensor).blocks_matching(&selection)?;
         let block_indexes = std::slice::from_raw_parts_mut(block_indexes, *count);

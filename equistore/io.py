@@ -10,7 +10,8 @@ from .tensor import TensorMap
 
 
 def load(path: str, use_numpy=False) -> TensorMap:
-    """Load a previously saved :py:class:`equistore.TensorMap` from the given path.
+    """
+    Load a previously saved :py:class:`equistore.TensorMap` from the given path.
 
     :py:class:`equistore.TensorMap` are serialized using numpy's ``.npz``
     format, i.e. a ZIP file without compression (storage method is ``STORED``),
