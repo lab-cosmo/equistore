@@ -357,6 +357,99 @@ class TensorMap:
         """Names of the property labels for all blocks in this tensor map"""
         return self.block(0).properties.names
 
+    def slice(self, samples=None, properties=None):
+        """Creates a :py:class:`TensorMap` object whose blocks
+        contain only the elements of `tensor` that match the sample
+        and/or property labels specified in `samples` and `properties.
+
+        :param tensor: the :py:class:`TensorMap` to be sliced
+        :param samples: :py:class:`Labels` that specify a filter to be
+            applied to the sample indices in `tensor`
+        :param properties: :py:class:`Labels` that specify a filter to be
+            applied to the property indices in `tensor`
+
+        .. code-block:: python
+
+            sliced_tensor = tensor.slice(
+                samples=Labels(["structure", "atom"], values= ... ),
+                properties=Labels(["n_1", "l_1"], values= ... ),
+            )
+
+        """
+
+        sliced_keys = []
+        sliced_blocks = []
+        if samples is None and properties is None:
+            return self
+
+        if samples is not None:
+            samples_names = list(samples.names)
+            samples_tuple = samples.tolist()
+
+        if properties is not None:
+            properties_names = list(properties.names)
+            properties_tuple = properties.tolist()
+
+        for key, block in self:
+            if samples is None:
+                sliced_samples = block.samples
+                block_values = block.values
+            else:
+                block_samples = block.samples[samples_names].tolist()
+                samples_idx = []
+                for ismp, smp in enumerate(block_samples):
+                    if smp in samples_tuple:
+                        samples_idx.append(ismp)
+                samples_idx = np.asarray(samples_idx)
+                block_values = block.values[samples_idx]
+                samples_values = (
+                    block.samples[samples_idx]
+                    .view(dtype=np.int32)
+                    .reshape(-1, len(block.samples.names))
+                )
+                sliced_samples = Labels(
+                    names=block.samples.names, values=samples_values
+                )
+            if properties is None:
+                sliced_properties = block.properties
+            else:
+                block_properties = block.properties[properties_names].tolist()
+                properties_idx = []
+                for iprop, prop in enumerate(block_properties):
+                    if prop in properties_tuple:
+                        properties_idx.append(iprop)
+                properties_idx = np.asarray(properties_idx)
+                block_values = block_values[..., properties_idx]
+                properties_values = (
+                    block.properties[properties_idx]
+                    .view(dtype=np.int32)
+                    .reshape(-1, len(block.properties.names))
+                )
+                sliced_properties = Labels(
+                    names=block.properties.names, values=properties_values
+                )
+            if (samples is None or len(samples_idx) > 0) and (
+                properties is None or len(properties_idx) > 0
+            ):
+                sliced_keys.append(list(key))
+                sliced_blocks.append(
+                    TensorBlock(
+                        samples=sliced_samples,
+                        components=block.components,
+                        properties=sliced_properties,
+                        values=block_values,
+                    )
+                )
+
+        sliced_tensor = TensorMap(
+            keys=Labels(
+                names=self.keys.names, values=np.array(sliced_keys, dtype=np.int32)
+            ),
+            blocks=sliced_blocks,
+        )
+
+        return sliced_tensor
+
 
 def _normalize_keys_to_move(keys_to_move: Union[str, List[str], Labels]):
     if isinstance(keys_to_move, str):
