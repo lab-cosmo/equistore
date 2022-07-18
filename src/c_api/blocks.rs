@@ -305,7 +305,7 @@ pub unsafe extern fn eqs_block_add_gradient(
 /// @param parameters will be set to the first element of an array of
 ///                   NULL-terminated UTF-8 strings containing all the
 ///                   parameters for which a gradient exists in the block
-/// @param count will be set to the number of elements in `parameters`
+/// @param parameters_count will be set to the number of elements in `parameters`
 ///
 /// @returns The status code of this operation. If the status is not
 ///          `EQS_SUCCESS`, you can use `eqs_last_error()` to get the full
@@ -314,13 +314,13 @@ pub unsafe extern fn eqs_block_add_gradient(
 pub unsafe extern fn eqs_block_gradients_list(
     block: *mut eqs_block_t,
     parameters: *mut *const *const c_char,
-    count: *mut u64
+    parameters_count: *mut usize
 ) -> eqs_status_t {
     catch_unwind(|| {
-        check_pointers!(block, parameters, count);
+        check_pointers!(block, parameters, parameters_count);
 
         let list = (*block).gradient_parameters_c();
-        (*count) = list.len() as u64;
+        (*parameters_count) = list.len();
 
         (*parameters) = if list.is_empty() {
             std::ptr::null()

@@ -149,7 +149,7 @@ typedef struct eqs_array_t {
   /**
    * This function needs to store the "data origin" for this array in
    * `origin`. Users of `eqs_array_t` should register a single data
-   * origin with `register_data_origin`, and use it for all compatible
+   * origin with `eqs_register_data_origin`, and use it for all compatible
    * arrays.
    */
   eqs_status_t (*origin)(const void *array, eqs_data_origin_t *origin);
@@ -187,7 +187,10 @@ typedef struct eqs_array_t {
    */
   eqs_status_t (*create)(const void *array, const uintptr_t *shape, uintptr_t shape_count, struct eqs_array_t *new_array);
   /**
-   * Make a copy of this `array` and return the new array in `new_array`
+   * Make a copy of this `array` and return the new array in `new_array`.
+   *
+   * The new array is expected to have the same data origin and parameters
+   * (data type, data location, etc.)
    */
   eqs_status_t (*copy)(const void *array, struct eqs_array_t *new_array);
   /**
@@ -239,7 +242,7 @@ const char *eqs_last_error(void);
  *
  * @param labels set of labels coming from an `eqs_block_t` or an `eqs_tensormap_t`
  * @param values array containing the label to lookup
- * @param count size of the values array
+ * @param values_count size of the values array
  * @param result position of the values in the labels or -1 if the values
  *               were not found
  *
@@ -249,7 +252,7 @@ const char *eqs_last_error(void);
  */
 eqs_status_t eqs_labels_position(struct eqs_labels_t labels,
                                  const int32_t *values,
-                                 uint64_t count,
+                                 uintptr_t values_count,
                                  int64_t *result);
 
 /**
@@ -277,7 +280,7 @@ eqs_status_t eqs_register_data_origin(const char *name, eqs_data_origin_t *origi
  *          `EQS_SUCCESS`, you can use `eqs_last_error()` to get the full
  *          error message.
  */
-eqs_status_t eqs_get_data_origin(eqs_data_origin_t origin, char *buffer, uint64_t buffer_size);
+eqs_status_t eqs_get_data_origin(eqs_data_origin_t origin, char *buffer, uintptr_t buffer_size);
 
 /**
  * Access the data stored inside a rust ndarray.
@@ -435,7 +438,7 @@ eqs_status_t eqs_block_add_gradient(struct eqs_block_t *block,
  * @param parameters will be set to the first element of an array of
  *                   NULL-terminated UTF-8 strings containing all the
  *                   parameters for which a gradient exists in the block
- * @param count will be set to the number of elements in `parameters`
+ * @param parameters_count will be set to the number of elements in `parameters`
  *
  * @returns The status code of this operation. If the status is not
  *          `EQS_SUCCESS`, you can use `eqs_last_error()` to get the full
@@ -443,7 +446,7 @@ eqs_status_t eqs_block_add_gradient(struct eqs_block_t *block,
  */
 eqs_status_t eqs_block_gradients_list(struct eqs_block_t *block,
                                       const char *const **parameters,
-                                      uint64_t *count);
+                                      uintptr_t *parameters_count);
 
 /**
  * Create a new `eqs_tensormap_t` with the given `keys` and `blocks`.
@@ -465,7 +468,7 @@ eqs_status_t eqs_block_gradients_list(struct eqs_block_t *block,
  */
 struct eqs_tensormap_t *eqs_tensormap(struct eqs_labels_t keys,
                                       struct eqs_block_t **blocks,
-                                      uint64_t blocks_count);
+                                      uintptr_t blocks_count);
 
 /**
  * Free the memory associated with a `tensor` previously created with
@@ -514,7 +517,7 @@ eqs_status_t eqs_tensormap_keys(const struct eqs_tensormap_t *tensor, struct eqs
  */
 eqs_status_t eqs_tensormap_block_by_id(const struct eqs_tensormap_t *tensor,
                                        const struct eqs_block_t **block,
-                                       uint64_t index);
+                                       uintptr_t index);
 
 /**
  * Get indices of the blocks in this `tensor` corresponding to the given
@@ -600,7 +603,7 @@ eqs_status_t eqs_tensormap_keys_to_properties(struct eqs_tensormap_t *tensor,
  */
 eqs_status_t eqs_tensormap_components_to_properties(struct eqs_tensormap_t *tensor,
                                                     const char *const *variables,
-                                                    uint64_t variables_count);
+                                                    uintptr_t variables_count);
 
 /**
  * Merge blocks with the same value for selected keys variables along the

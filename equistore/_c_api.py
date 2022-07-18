@@ -92,7 +92,7 @@ def setup_functions(lib):
     lib.eqs_labels_position.argtypes = [
         eqs_labels_t,
         POINTER(ctypes.c_int32),
-        ctypes.c_uint64,
+        c_uintptr_t,
         POINTER(ctypes.c_int64),
     ]
     lib.eqs_labels_position.restype = _check_status
@@ -106,7 +106,7 @@ def setup_functions(lib):
     lib.eqs_get_data_origin.argtypes = [
         eqs_data_origin_t,
         ctypes.c_char_p,
-        ctypes.c_uint64,
+        c_uintptr_t,
     ]
     lib.eqs_get_data_origin.restype = _check_status
 
@@ -165,14 +165,14 @@ def setup_functions(lib):
     lib.eqs_block_gradients_list.argtypes = [
         POINTER(eqs_block_t),
         POINTER(POINTER(ctypes.c_char_p)),
-        POINTER(ctypes.c_uint64),
+        POINTER(c_uintptr_t),
     ]
     lib.eqs_block_gradients_list.restype = _check_status
 
     lib.eqs_tensormap.argtypes = [
         eqs_labels_t,
         POINTER(POINTER(eqs_block_t)),
-        ctypes.c_uint64,
+        c_uintptr_t,
     ]
     lib.eqs_tensormap.restype = POINTER(eqs_tensormap_t)
 
@@ -190,7 +190,7 @@ def setup_functions(lib):
     lib.eqs_tensormap_block_by_id.argtypes = [
         POINTER(eqs_tensormap_t),
         POINTER(POINTER(eqs_block_t)),
-        ctypes.c_uint64,
+        c_uintptr_t,
     ]
     lib.eqs_tensormap_block_by_id.restype = _check_status
 
@@ -212,7 +212,7 @@ def setup_functions(lib):
     lib.eqs_tensormap_components_to_properties.argtypes = [
         POINTER(eqs_tensormap_t),
         POINTER(ctypes.c_char_p),
-        ctypes.c_uint64,
+        c_uintptr_t,
     ]
     lib.eqs_tensormap_components_to_properties.restype = _check_status
 

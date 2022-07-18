@@ -78,7 +78,7 @@ pub struct eqs_array_t {
 
     /// This function needs to store the "data origin" for this array in
     /// `origin`. Users of `eqs_array_t` should register a single data
-    /// origin with `register_data_origin`, and use it for all compatible
+    /// origin with `eqs_register_data_origin`, and use it for all compatible
     /// arrays.
     origin: Option<unsafe extern fn(
         array: *const c_void,
@@ -133,7 +133,10 @@ pub struct eqs_array_t {
         new_array: *mut eqs_array_t,
     ) -> eqs_status_t>,
 
-    /// Make a copy of this `array` and return the new array in `new_array`
+    /// Make a copy of this `array` and return the new array in `new_array`.
+    ///
+    /// The new array is expected to have the same data origin and parameters
+    /// (data type, data location, etc.)
     copy: Option<unsafe extern fn(
         array: *const c_void,
         new_array: *mut eqs_array_t,

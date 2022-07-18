@@ -59,18 +59,17 @@ impl std::ops::DerefMut for eqs_tensormap_t {
 ///          case of error. In case of error, you can use `eqs_last_error()`
 ///          to get the error message.
 #[no_mangle]
-#[allow(clippy::cast_possible_truncation)]
 pub unsafe extern fn eqs_tensormap(
     keys: eqs_labels_t,
     blocks: *mut *mut eqs_block_t,
-    blocks_count: u64,
+    blocks_count: usize,
 ) -> *mut eqs_tensormap_t {
     let mut result = std::ptr::null_mut();
     let unwind_wrapper = std::panic::AssertUnwindSafe(&mut result);
     let status = catch_unwind(move || {
         let keys = Labels::try_from(&keys)?;
 
-        let blocks_slice = std::slice::from_raw_parts_mut(blocks, blocks_count as usize);
+        let blocks_slice = std::slice::from_raw_parts_mut(blocks, blocks_count);
         // check for uniqueness of the pointers: we don't want to move out
         // the same value twice
         if blocks_slice.iter().collect::<BTreeSet<_>>().len() != blocks_slice.len() {
@@ -166,16 +165,15 @@ pub unsafe extern fn eqs_tensormap_keys(
 ///          `EQS_SUCCESS`, you can use `eqs_last_error()` to get the full
 ///          error message.
 #[no_mangle]
-#[allow(clippy::cast_possible_truncation)]
 pub unsafe extern fn eqs_tensormap_block_by_id(
     tensor: *const eqs_tensormap_t,
     block: *mut *const eqs_block_t,
-    index: u64,
+    index: usize,
 ) -> eqs_status_t {
     catch_unwind(|| {
         check_pointers!(tensor, block);
 
-        (*block) = (&(*tensor).blocks()[index as usize] as *const TensorBlock).cast();
+        (*block) = (&(*tensor).blocks()[index] as *const TensorBlock).cast();
 
         Ok(())
     })
@@ -210,6 +208,13 @@ pub unsafe extern fn eqs_tensormap_blocks_matching(
 ) -> eqs_status_t {
     catch_unwind(|| {
         check_pointers!(tensor, block_indexes, count);
+
+        if *count != (*tensor).keys().count() {
+            return Err(Error::InvalidParameter(format!(
+                "expected an array of {} elements as input to eqs_tensormap_blocks_matching, got {} elements",
+                (*tensor).keys().count(), *count
+            )));
+        }
 
         let selection = Labels::try_from(&selection)?;
         let rust_blocks = (*tensor).blocks_matching(&selection)?;
@@ -260,7 +265,6 @@ pub unsafe extern fn eqs_tensormap_blocks_matching(
 ///          `EQS_SUCCESS`, you can use `eqs_last_error()` to get the full
 ///          error message.
 #[no_mangle]
-#[allow(clippy::cast_possible_truncation)]
 pub unsafe extern fn eqs_tensormap_keys_to_properties(
     tensor: *mut eqs_tensormap_t,
     keys_to_move: eqs_labels_t,
@@ -291,17 +295,16 @@ pub unsafe extern fn eqs_tensormap_keys_to_properties(
 ///          `EQS_SUCCESS`, you can use `eqs_last_error()` to get the full
 ///          error message.
 #[no_mangle]
-#[allow(clippy::cast_possible_truncation)]
 pub unsafe extern fn eqs_tensormap_components_to_properties(
     tensor: *mut eqs_tensormap_t,
     variables: *const *const c_char,
-    variables_count: u64,
+    variables_count: usize,
 ) -> eqs_status_t {
     catch_unwind(|| {
         check_pointers!(tensor, variables);
 
         let mut rust_variables = Vec::new();
-        for &variable in std::slice::from_raw_parts(variables, variables_count as usize) {
+        for &variable in std::slice::from_raw_parts(variables, variables_count) {
             check_pointers!(variable);
             let variable = CStr::from_ptr(variable).to_str().expect("invalid utf8");
             rust_variables.push(variable);
@@ -342,7 +345,6 @@ pub unsafe extern fn eqs_tensormap_components_to_properties(
 ///          `EQS_SUCCESS`, you can use `eqs_last_error()` to get the full
 ///          error message.
 #[no_mangle]
-#[allow(clippy::cast_possible_truncation)]
 pub unsafe extern fn eqs_tensormap_keys_to_samples(
     tensor: *mut eqs_tensormap_t,
     keys_to_move: eqs_labels_t,

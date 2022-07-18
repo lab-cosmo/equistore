@@ -98,14 +98,13 @@ impl std::convert::TryFrom<&Labels> for eqs_labels_t {
 }
 
 
-#[allow(clippy::cast_possible_truncation)]
 /// Get the position of the entry defined by the `values` array in the given set
 /// of `labels`. This operation is only available if the labels correspond to a
 /// set of Rust Labels (i.e. `labels.labels_ptr` is not NULL).
 ///
 /// @param labels set of labels coming from an `eqs_block_t` or an `eqs_tensormap_t`
 /// @param values array containing the label to lookup
-/// @param count size of the values array
+/// @param values_count size of the values array
 /// @param result position of the values in the labels or -1 if the values
 ///               were not found
 ///
@@ -116,19 +115,26 @@ impl std::convert::TryFrom<&Labels> for eqs_labels_t {
 pub unsafe extern fn eqs_labels_position(
     labels: eqs_labels_t,
     values: *const i32,
-    count: u64,
+    values_count: usize,
     result: *mut i64
 ) -> eqs_status_t {
     catch_unwind(|| {
         if labels.labels_ptr.is_null() {
             return Err(Error::InvalidParameter(
                 "these labels do not support calling eqs_labels_position".into()
-            ))
+            ));
         }
 
-        let labels = labels.labels_ptr.cast::<Labels>();
-        let label = std::slice::from_raw_parts(values.cast(), count as usize);
-        *result = (*labels).position(label).map_or(-1, |p| p as i64);
+        let labels = &(*labels.labels_ptr.cast::<Labels>());
+        if values_count != labels.size() {
+            return Err(Error::InvalidParameter(format!(
+                "expected label of size {} in eqs_labels_position, got size {}",
+                (*labels).size(), values_count
+            )));
+        }
+
+        let label = std::slice::from_raw_parts(values.cast(), values_count);
+        *result = labels.position(label).map_or(-1, |p| p as i64);
 
         Ok(())
     })

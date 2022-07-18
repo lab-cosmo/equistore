@@ -43,17 +43,16 @@ pub unsafe extern fn eqs_register_data_origin(
 ///          `EQS_SUCCESS`, you can use `eqs_last_error()` to get the full
 ///          error message.
 #[no_mangle]
-#[allow(clippy::cast_possible_truncation)]
 pub unsafe extern fn eqs_get_data_origin(
     origin: eqs_data_origin_t,
     buffer: *mut c_char,
-    buffer_size: u64,
+    buffer_size: usize,
 ) -> eqs_status_t {
     catch_unwind(|| {
         check_pointers!(buffer);
 
         let origin = crate::get_data_origin(origin);
-        return copy_str_to_c(&origin, buffer, buffer_size as usize);
+        return copy_str_to_c(&origin, buffer, buffer_size);
     })
 }
 

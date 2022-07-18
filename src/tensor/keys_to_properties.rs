@@ -359,7 +359,7 @@ mod tests {
             example_labels(vec!["key_1", "properties"], vec![[2, 0]])
         );
 
-        // The new third block contains the old second block
+        // The new third block contains the old fourth block
         let block = &tensor.blocks()[2];
         assert_eq!(block.values().data.as_array(), ArrayD::from_elem(vec![4, 3, 1], 4.0));
         assert_eq!(

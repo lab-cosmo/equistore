@@ -259,7 +259,10 @@ class TensorMap:
         return TensorBlock._from_ptr(block, parent=self, owning=False)
 
     def keys_to_properties(
-        self, keys_to_move: Union[str, List[str], Labels], sort_samples=True
+        self,
+        keys_to_move: Union[str, List[str], Labels],
+        *,
+        sort_samples=True,
     ):
         """
         Merge blocks with the same value for selected keys variables along the
@@ -298,7 +301,12 @@ class TensorMap:
             self._ptr, keys_to_move._as_eqs_labels_t(), sort_samples
         )
 
-    def keys_to_samples(self, keys_to_move: Union[str, List[str]], sort_samples=True):
+    def keys_to_samples(
+        self,
+        keys_to_move: Union[str, List[str]],
+        *,
+        sort_samples=True,
+    ):
         """
         Merge blocks with the same value for selected keys variables along the
         samples axis.

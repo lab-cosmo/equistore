@@ -58,7 +58,7 @@ def _is_torch_array(array):
 
 def _register_origin(name):
     lib = _get_library()
-    origin = ctypes.c_uint64(0)
+    origin = eqs_data_origin_t(0)
     lib.eqs_register_data_origin(name.encode("utf8"), origin)
     return origin.value
 

@@ -27,9 +27,11 @@ class TestIo(unittest.TestCase):
             )
 
             self.assertEquals(block.samples.names, ("structure", "center"))
+            self.assertEquals(block.values.shape, (9, 5, 3))
 
             gradient = block.gradient("positions")
             self.assertEquals(gradient.samples.names, ("sample", "structure", "atom"))
+            self.assertEquals(gradient.data.shape, (59, 3, 5, 3))
 
         path = os.path.join(ROOT, "..", "data.npz")
 
